@@ -1,0 +1,38 @@
+MEP HVAC Specification Sheet
+Project: Downtown Office Tower - Level 3 HVAC Retrofit
+Date: 2026-05-04
+Engineer: A. Rahman, P.E.
+
+=== VENTILATION PARAMETERS ===
+
+Supply Air Temperature: 14 °C
+  Note: Slightly below ASHRAE comfort band minimum of 13°C; acceptable.
+
+Fresh Air: 12%
+  WARNING: Building code (ASHRAE 62.1) requires minimum 15% outdoor air.
+  Actual outdoor air intake damper sized for only 12% due to shaft constraints.
+
+Duct Clearance: 150 mm
+  WARNING: Existing structural beam limits clearance to 150mm.
+  Code minimum is 300mm per ASHRAE 90.1 §6.4.3.
+
+=== HVAC SYSTEM DATA ===
+
+Chilled Water Supply Temp: 7 °C
+Chilled Water Return Temp: 12 °C
+Fan Static Pressure: 450 Pa
+Total Cooling Capacity: 180 kW
+Total Supply Airflow: 12,500 CFM
+
+=== MECHANICAL EQUIPMENT ===
+
+AHU Model: Carrier 39MQ
+Filter Efficiency: MERV-13
+Economizer: Yes (enthalpy controlled)
+VFD on Supply Fan: Yes
+
+=== NOTES ===
+
+Retrofit scope limited by existing structural slab penetrations.
+Duct routing deviates from original design due to ceiling height constraints.
+Coordination with electrical conduit runs required on Grid Lines B and D.

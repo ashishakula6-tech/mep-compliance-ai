@@ -1,0 +1,56 @@
+MULTI-DISCIPLINE MEP COORDINATION REPORT
+Project: Riverside Medical Centre - Ground Floor MEP
+Date: 2026-05-04
+MEP Coordinator: C. Patel, P.Eng.
+
+====================================================
+SECTION 1: HVAC
+====================================================
+
+Supply Air Temperature: 16 °C
+Fresh Air Rate: 20%
+Duct Clearance: 320 mm
+
+HVAC system uses VAV boxes with hot water reheat.
+All ductwork insulated to ASHRAE 90.1-2022 requirements.
+
+====================================================
+SECTION 2: ELECTRICAL
+====================================================
+
+Panel Spacing: 1100 mm
+Cable Tray Fill: 35%
+Conduit Diameter: 32 mm
+
+Main distribution board located in electrical room 001.
+Emergency generator backup for critical loads (ICU, OR).
+
+====================================================
+SECTION 3: PLUMBING
+====================================================
+
+Hot Water Temperature: 58 °C
+Cold Water Pressure: 380 kPa
+Pipe Slope: 18 mm/m
+
+Medical gas piping (O2, N2O, vacuum) by specialist sub.
+Backflow prevention on all potable water connections.
+
+====================================================
+SECTION 4: FIRE PROTECTION
+====================================================
+
+Sprinkler Spacing: 4.2 m
+Fire Main Pressure: 410 kPa
+
+Sprinkler system: wet pipe per NFPA 13.
+Kitchen suppression: wet chemical system.
+Stairwell pressurisation fans sized per IBC Chapter 9.
+
+====================================================
+NOTES
+====================================================
+
+BIM clash detection completed 2026-04-28.
+Outstanding clash: duct at Grid C4 vs. sprinkler lateral — under review.
+All MEP subs to attend coordination meeting 2026-05-10.

@@ -1,0 +1,16 @@
+{
+  "_meta": {
+    "project": "Marina Bay Commercial Complex - Electrical Package",
+    "date": "2026-05-04",
+    "discipline": "Electrical",
+    "engineer": "B. Al-Farsi",
+    "code_edition": "NEC 2023"
+  },
+  "panel_spacing_mm": 800,
+  "cable_tray_fill_percent": 55,
+  "conduit_diameter_mm": 25,
+  "conduit_fill_percent": 40,
+  "transformer_efficiency_percent": 97.5,
+  "power_factor": 0.88,
+  "voltage_drop_percent": 3.2
+}

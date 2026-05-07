@@ -1,0 +1,1081 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>MEP Compliance AI</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+*{font-family:'Inter',sans-serif;box-sizing:border-box}
+body{background:#06080f;color:#e2e8f0;margin:0;overflow:hidden}
+.glass{background:rgba(255,255,255,.028);border:1px solid rgba(255,255,255,.07)}
+.glass2{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1)}
+.sev-CRITICAL{background:linear-gradient(135deg,rgba(239,68,68,.12),transparent);border:1px solid rgba(239,68,68,.35);border-left:3px solid #ef4444}
+.sev-HIGH{background:linear-gradient(135deg,rgba(249,115,22,.12),transparent);border:1px solid rgba(249,115,22,.35);border-left:3px solid #f97316}
+.sev-MEDIUM{background:linear-gradient(135deg,rgba(234,179,8,.12),transparent);border:1px solid rgba(234,179,8,.35);border-left:3px solid #eab308}
+.sev-LOW{background:linear-gradient(135deg,rgba(34,197,94,.12),transparent);border:1px solid rgba(34,197,94,.35);border-left:3px solid #22c55e}
+.badge-CRITICAL{background:#ef4444;color:#fff;font-weight:700}
+.badge-HIGH{background:#f97316;color:#fff;font-weight:700}
+.badge-MEDIUM{background:#eab308;color:#000;font-weight:700}
+.badge-LOW{background:#22c55e;color:#000;font-weight:700}
+.col-CRITICAL{color:#ef4444}.col-HIGH{color:#f97316}.col-MEDIUM{color:#eab308}.col-LOW{color:#22c55e}
+.spin{animation:spin .9s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.fu{animation:fu .35s ease both}
+@keyframes fu{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.pulse{animation:pu 2s infinite}
+@keyframes pu{0%,100%{opacity:1}50%{opacity:.35}}
+.nav-it{padding:9px 12px;border-radius:8px;cursor:pointer;display:flex;align-items:center;gap:10px;font-size:.78rem;color:#64748b;transition:all .15s;border-left:2px solid transparent}
+.nav-it:hover{background:rgba(255,255,255,.04);color:#94a3b8}
+.nav-it.act{background:rgba(99,102,241,.1);border-left-color:#6366f1;color:#a5b4fc}
+.dz{border:2px dashed rgba(99,102,241,.3);border-radius:12px;transition:all .2s;cursor:pointer}
+.dz:hover,.dz.on{border-color:#6366f1;background:rgba(99,102,241,.06)}
+.pbar{height:6px;border-radius:99px;background:rgba(255,255,255,.06);overflow:hidden}
+.pbar-fill{height:100%;border-radius:99px;transition:width 1.3s ease}
+.ring-anim{transition:stroke-dasharray 1.4s cubic-bezier(.4,0,.2,1)}
+.ai-bub{background:rgba(99,102,241,.08);border:1px solid rgba(99,102,241,.2);border-radius:2px 12px 12px 12px;padding:12px 14px}
+.usr-bub{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:12px 2px 12px 12px;padding:10px 14px}
+.fix-bub{background:rgba(34,197,94,.06);border:1px solid rgba(34,197,94,.2);border-radius:12px;padding:12px 14px}
+.tw-cur::after{content:'▋';animation:blink .6s infinite;color:#6366f1;font-size:.8em}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+.step{display:flex;align-items:flex-start;gap:10px;font-size:.72rem}
+.step .dot{width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;transition:all .3s}
+.step.done .dot{background:rgba(34,197,94,.2);border:1px solid #22c55e}
+.step.act .dot{background:rgba(99,102,241,.2);border:1px solid #6366f1;animation:pu 1s infinite}
+.step.wait .dot{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1)}
+.step.done .lbl{color:#86efac}.step.act .lbl{color:#a5b4fc}.step.wait .lbl{color:#374151}
+.scan-pass{animation:sPass .5s ease forwards}
+@keyframes sPass{0%{background:rgba(34,197,94,.25)}100%{background:transparent}}
+.scan-fail{animation:sFail .5s ease forwards}
+@keyframes sFail{0%{background:rgba(239,68,68,.35)}100%{background:rgba(239,68,68,.06)}}
+.card{transition:all .18s;cursor:pointer}
+.card:hover{background:rgba(255,255,255,.04);transform:translateY(-1px)}
+.inp{width:100%;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:9px 12px;font-size:.82rem;color:#e2e8f0;outline:none;transition:border .15s}
+.inp:focus{border-color:rgba(99,102,241,.5)}
+.inp::placeholder{color:#374151}
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);backdrop-filter:blur(4px);z-index:100;display:flex;align-items:center;justify-content:center}
+.chat-panel{position:fixed;right:0;top:0;bottom:0;width:340px;background:#0d1117;border-left:1px solid rgba(255,255,255,.08);z-index:50;display:flex;flex-direction:column;transform:translateX(100%);transition:transform .3s cubic-bezier(.4,0,.2,1)}
+.chat-panel.open{transform:translateX(0)}
+.chip{background:rgba(99,102,241,.1);border:1px solid rgba(99,102,241,.25);border-radius:20px;padding:5px 12px;font-size:.68rem;color:#a5b4fc;cursor:pointer;transition:all .15s;white-space:nowrap}
+.chip:hover{background:rgba(99,102,241,.2)}
+.chk-item{display:flex;align-items:flex-start;gap:8px;padding:6px 8px;border-radius:6px;transition:background .15s}
+.chk-item:hover{background:rgba(255,255,255,.03)}
+.chk-item input[type=checkbox]{margin-top:2px;accent-color:#6366f1;flex-shrink:0}
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:#1e2535;border-radius:2px}
+</style>
+</head>
+<body>
+
+<!-- ── AUTH OVERLAY ── -->
+<div id="auth-overlay" class="overlay">
+  <div class="glass rounded-2xl p-8 w-full max-w-sm fu">
+    <div class="flex items-center gap-3 mb-6">
+      <div style="background:linear-gradient(135deg,#6366f1,#8b5cf6);width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:700;color:#fff">AI</div>
+      <div><p class="text-white font-bold text-sm">MEP Compliance AI</p><p style="font-size:.62rem" class="text-gray-500">Professional MEP Compliance Platform</p></div>
+    </div>
+    <!-- tabs -->
+    <div class="flex gap-1 glass rounded-lg p-1 mb-5">
+      <button id="tab-login" onclick="authTab('login')" class="flex-1 py-1.5 rounded-md text-xs font-semibold text-white" style="background:rgba(99,102,241,.35)">Sign In</button>
+      <button id="tab-signup" onclick="authTab('signup')" class="flex-1 py-1.5 rounded-md text-xs font-semibold text-gray-500">Create Account</button>
+    </div>
+    <!-- login form -->
+    <div id="form-login" class="space-y-3">
+      <div><label style="font-size:.62rem" class="block text-gray-500 mb-1">Username or Email</label><input id="l-user" class="inp" placeholder="Enter username or email"/></div>
+      <div><label style="font-size:.62rem" class="block text-gray-500 mb-1">Password</label><input id="l-pass" type="password" class="inp" placeholder="Enter password" onkeydown="if(event.key==='Enter')doLogin()"/></div>
+      <p id="l-err" class="text-red-400 text-xs hidden"></p>
+      <button onclick="doLogin()" class="w-full py-2.5 rounded-lg text-sm font-semibold text-white mt-1" style="background:linear-gradient(135deg,#6366f1,#8b5cf6)">Sign In</button>
+      <div class="border-t border-white/5 pt-3">
+        <p style="font-size:.62rem" class="text-gray-600 mb-2 text-center">Or try with demo account:</p>
+        <button onclick="demoLogin()" class="w-full py-2 rounded-lg text-xs text-indigo-400 glass2 hover:bg-white/8 transition-colors">Use Demo Account (demo / demo123)</button>
+      </div>
+    </div>
+    <!-- signup form -->
+    <div id="form-signup" class="space-y-3 hidden">
+      <div class="grid grid-cols-2 gap-3">
+        <div><label style="font-size:.62rem" class="block text-gray-500 mb-1">Full Name</label><input id="s-name" class="inp" placeholder="John Smith"/></div>
+        <div><label style="font-size:.62rem" class="block text-gray-500 mb-1">Username</label><input id="s-user" class="inp" placeholder="jsmith"/></div>
+      </div>
+      <div><label style="font-size:.62rem" class="block text-gray-500 mb-1">Email</label><input id="s-email" class="inp" placeholder="j@firm.com"/></div>
+      <div><label style="font-size:.62rem" class="block text-gray-500 mb-1">Password</label><input id="s-pass" type="password" class="inp" placeholder="Min 4 characters" onkeydown="if(event.key==='Enter')doSignup()"/></div>
+      <p id="s-err" class="text-red-400 text-xs hidden"></p>
+      <button onclick="doSignup()" class="w-full py-2.5 rounded-lg text-sm font-semibold text-white mt-1" style="background:linear-gradient(135deg,#6366f1,#8b5cf6)">Create Account</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── AI CHAT PANEL ── -->
+<div id="chat-panel" class="chat-panel">
+  <div class="flex items-center justify-between px-4 py-3 border-b border-white/8 flex-shrink-0">
+    <div class="flex items-center gap-2.5">
+      <div style="background:linear-gradient(135deg,#6366f1,#8b5cf6);width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:.55rem;font-weight:700;color:#fff">AI</div>
+      <div><p class="text-white text-xs font-semibold">AI Compliance Assistant</p><div class="flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-green-500 pulse"></span><span style="font-size:.58rem" class="text-gray-500">Analysing report</span></div></div>
+    </div>
+    <button onclick="toggleChat(false)" class="text-gray-600 hover:text-gray-400"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
+  </div>
+  <div id="chat-msgs" class="flex-1 overflow-y-auto p-4 space-y-3"></div>
+  <div class="p-3 border-t border-white/8 flex-shrink-0">
+    <p style="font-size:.6rem" class="text-gray-600 uppercase tracking-wider mb-2">Suggested questions</p>
+    <div id="chat-chips" class="flex flex-wrap gap-1.5 mb-3"></div>
+    <div class="flex gap-2">
+      <input id="chat-inp" class="inp flex-1 text-xs" placeholder="Ask about this report…" onkeydown="if(event.key==='Enter')chatSend()"/>
+      <button onclick="chatSend()" class="px-3 py-2 rounded-lg text-xs font-semibold text-white flex-shrink-0" style="background:rgba(99,102,241,.4)">→</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── PROJECT MODAL ── -->
+<div id="proj-modal" class="overlay hidden">
+  <div class="glass rounded-2xl p-6 w-full max-w-sm fu">
+    <p class="text-white font-semibold text-sm mb-4">Create New Project</p>
+    <div class="space-y-3">
+      <div><label style="font-size:.62rem" class="block text-gray-500 mb-1">Project Name</label><input id="pm-name" class="inp" placeholder="Tower A MEP Review"/></div>
+      <div><label style="font-size:.62rem" class="block text-gray-500 mb-1">Description (optional)</label><input id="pm-desc" class="inp" placeholder="Q2 2026 compliance audit"/></div>
+      <p id="pm-err" class="text-red-400 text-xs hidden"></p>
+      <div class="flex gap-2 pt-1">
+        <button onclick="document.getElementById('proj-modal').classList.add('hidden')" class="flex-1 py-2 rounded-lg text-xs text-gray-400 glass2">Cancel</button>
+        <button onclick="createProject()" class="flex-1 py-2 rounded-lg text-xs font-semibold text-white" style="background:rgba(99,102,241,.4)">Create</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── ATTACH TO PROJECT MODAL ── -->
+<div id="attach-modal" class="overlay hidden">
+  <div class="glass rounded-2xl p-6 w-full max-w-sm fu">
+    <p class="text-white font-semibold text-sm mb-1">Save to Project</p>
+    <p style="font-size:.68rem" class="text-gray-500 mb-4">Attach this report to a project for team tracking.</p>
+    <div id="attach-list" class="space-y-2 mb-4 max-h-48 overflow-y-auto"></div>
+    <div class="flex gap-2">
+      <button onclick="document.getElementById('attach-modal').classList.add('hidden')" class="flex-1 py-2 rounded-lg text-xs text-gray-400 glass2">Cancel</button>
+      <button onclick="document.getElementById('proj-modal').classList.remove('hidden');document.getElementById('attach-modal').classList.add('hidden')" class="flex-1 py-2 rounded-lg text-xs text-indigo-400 glass2">+ New Project</button>
+    </div>
+  </div>
+</div>
+
+<div class="flex h-screen">
+
+<!-- ── SIDEBAR ── -->
+<aside style="width:210px;min-width:210px" class="glass border-r border-white/5 flex flex-col flex-shrink-0">
+  <div class="px-4 py-4 border-b border-white/5">
+    <div class="flex items-center gap-2.5">
+      <div style="background:linear-gradient(135deg,#6366f1,#8b5cf6);width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:.65rem;font-weight:700;color:#fff;flex-shrink:0">AI</div>
+      <div><p style="font-size:.78rem;font-weight:600" class="text-white">MEP Compliance</p>
+        <div class="flex items-center gap-1.5 mt-0.5"><span class="w-1.5 h-1.5 rounded-full bg-green-500 pulse"></span><span style="font-size:.6rem" class="text-gray-500">AI Engine Active</span></div>
+      </div>
+    </div>
+  </div>
+  <nav class="flex-1 px-2 py-3 space-y-0.5">
+    <div onclick="pg('dash')" id="n-dash" class="nav-it act"><svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg>Dashboard</div>
+    <div onclick="pg('check')" id="n-check" class="nav-it"><svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>Run Check</div>
+    <div onclick="pg('hist')" id="n-hist" class="nav-it"><svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>Reports<span id="hbadge" class="ml-auto text-xs bg-indigo-600/30 text-indigo-300 px-1.5 py-0.5 rounded-full hidden">0</span></div>
+    <div onclick="pg('projects')" id="n-projects" class="nav-it"><svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M3 7a2 2 0 012-2h4l2 2h8a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V7z"/></svg>Projects</div>
+    <div onclick="pg('rules')" id="n-rules" class="nav-it"><svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>Code Rules</div>
+  </nav>
+  <div id="user-card" class="px-3 py-3 border-t border-white/5">
+    <div class="flex items-center gap-2">
+      <div id="u-av" class="w-7 h-7 rounded-full bg-indigo-600/40 flex items-center justify-center text-white font-bold flex-shrink-0" style="font-size:.65rem">?</div>
+      <div class="flex-1 min-w-0"><p id="u-name" class="text-white truncate" style="font-size:.7rem;font-weight:600">Not signed in</p><p id="u-role" class="text-gray-600 truncate" style="font-size:.58rem">—</p></div>
+      <button onclick="doLogout()" title="Sign out" class="text-gray-700 hover:text-gray-400 flex-shrink-0"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg></button>
+    </div>
+  </div>
+</aside>
+
+<!-- ── MAIN ── -->
+<div class="flex-1 flex flex-col min-w-0">
+  <header class="glass border-b border-white/5 px-5 py-3 flex items-center justify-between flex-shrink-0">
+    <div><h1 id="ptit" class="text-white font-semibold text-sm">Dashboard</h1><p id="psub" style="font-size:.67rem" class="text-gray-500 mt-0.5">System overview</p></div>
+    <div class="flex items-center gap-2">
+      <button id="chat-toggle" onclick="toggleChat(true)" class="hidden items-center gap-1.5 glass2 text-indigo-400 text-xs font-semibold px-3 py-2 rounded-lg hover:bg-white/8 transition-colors">
+        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+        Ask AI
+      </button>
+      <button onclick="pg('check')" style="background:linear-gradient(135deg,#6366f1,#8b5cf6)" class="text-white text-xs font-semibold px-4 py-2 rounded-lg flex items-center gap-1.5 hover:opacity-90 transition-opacity">
+        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>New Check
+      </button>
+    </div>
+  </header>
+
+  <div class="flex-1 overflow-y-auto">
+
+    <!-- ═══ DASHBOARD ═══ -->
+    <div id="p-dash" class="p-5 space-y-5 fu">
+      <div class="grid grid-cols-4 gap-4">
+        <div class="glass rounded-xl p-4"><p style="font-size:.6rem" class="text-gray-500 uppercase tracking-wider mb-2">Total Checks</p><p class="text-3xl font-bold text-white" id="st-t">—</p><p style="font-size:.65rem" class="text-indigo-400 mt-1">reports generated</p></div>
+        <div class="glass rounded-xl p-4"><p style="font-size:.6rem" class="text-gray-500 uppercase tracking-wider mb-2">Violations Found</p><p class="text-3xl font-bold text-red-400" id="st-v">—</p><p style="font-size:.65rem" class="text-red-400/60 mt-1">across all reports</p></div>
+        <div class="glass rounded-xl p-4"><p style="font-size:.6rem" class="text-gray-500 uppercase tracking-wider mb-2">Avg Risk Score</p><p class="text-3xl font-bold text-white" id="st-a">—</p><p style="font-size:.65rem" class="text-gray-500 mt-1">out of 100</p></div>
+        <div class="glass rounded-xl p-4"><p style="font-size:.6rem" class="text-gray-500 uppercase tracking-wider mb-2">Code Rules</p><p class="text-3xl font-bold text-purple-400">11</p><p style="font-size:.65rem" class="text-purple-400/60 mt-1">ASHRAE·NEC·IPC·NFPA</p></div>
+      </div>
+      <div class="grid grid-cols-3 gap-4">
+        <div class="col-span-2 glass rounded-xl overflow-hidden">
+          <div class="px-5 py-3.5 border-b border-white/5 flex items-center justify-between">
+            <p class="text-white text-sm font-semibold">Recent Reports — Click for Full Drill-Down</p>
+            <button onclick="pg('hist')" class="text-indigo-400 text-xs hover:text-indigo-300">All →</button>
+          </div>
+          <div id="d-rec" class="divide-y divide-white/4"></div>
+        </div>
+        <div class="glass rounded-xl p-5">
+          <p class="text-white text-sm font-semibold mb-4">Severity Breakdown</p>
+          <div id="d-sev" class="space-y-3"></div>
+          <div class="mt-4 pt-4 border-t border-white/5 space-y-2">
+            <p style="font-size:.58rem" class="text-gray-500 uppercase tracking-wider mb-2">Active Standards</p>
+            <div class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-indigo-400"></span><span style="font-size:.66rem" class="text-gray-400 flex-1">HVAC (ASHRAE 90.1/62.1/55)</span></div>
+            <div class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-yellow-400"></span><span style="font-size:.66rem" class="text-gray-400 flex-1">Electrical (NEC 2023)</span></div>
+            <div class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-blue-400"></span><span style="font-size:.66rem" class="text-gray-400 flex-1">Plumbing (IPC 2021)</span></div>
+            <div class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-red-400"></span><span style="font-size:.66rem" class="text-gray-400 flex-1">Fire Protection (NFPA 13)</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ RUN CHECK ═══ -->
+    <div id="p-check" class="hidden p-5">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+        <div class="space-y-4">
+          <div class="glass rounded-xl overflow-hidden">
+            <div class="px-5 py-3.5 border-b border-white/5">
+              <p class="text-white text-sm font-semibold">Upload MEP Specification</p>
+              <p style="font-size:.67rem" class="text-gray-500 mt-0.5">.txt · .json · .pdf · .csv accepted</p>
+            </div>
+            <div class="p-5">
+              <div id="dz" class="dz p-8 text-center" onclick="document.getElementById('fi').click()"
+                   ondragover="dzev(event,'on')" ondragleave="dzev(event,'off')" ondrop="dzev(event,'drop')">
+                <div class="w-12 h-12 rounded-xl bg-indigo-600/15 border border-indigo-500/15 flex items-center justify-center mx-auto mb-3">
+                  <svg class="w-6 h-6 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5"/></svg>
+                </div>
+                <p class="text-white text-sm font-medium">Drop file here or click to browse</p>
+                <p style="font-size:.68rem" class="text-gray-500 mt-1">MEP spec sheets · JSON maps · PDF drawings</p>
+              </div>
+              <input type="file" id="fi" class="hidden" accept=".txt,.json,.pdf,.csv,.md" onchange="pickF(event)"/>
+              <div id="fchip" class="hidden mt-3 flex items-center justify-between glass2 rounded-lg px-3 py-2.5">
+                <div class="flex items-center gap-2.5">
+                  <div id="fext" class="w-8 h-8 rounded-md bg-indigo-600/25 flex items-center justify-center text-indigo-300 font-bold flex-shrink-0" style="font-size:.58rem"></div>
+                  <div><p id="fname" class="text-white text-xs font-medium"></p><p id="fsize" class="text-gray-500" style="font-size:.62rem"></p></div>
+                </div>
+                <button onclick="clrF()" class="text-gray-600 hover:text-gray-400"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
+              </div>
+              <button id="rbtn" onclick="runCheck()" disabled class="mt-3 w-full py-2.5 rounded-lg text-sm font-semibold" style="background:rgba(99,102,241,.15);color:#4b5563;cursor:not-allowed">Select a file to continue</button>
+            </div>
+          </div>
+          <div class="glass rounded-xl overflow-hidden">
+            <div class="px-5 py-3 border-b border-white/5 flex items-center justify-between cursor-pointer" onclick="togM()">
+              <p class="text-white text-sm font-semibold">Or Enter Values Manually</p>
+              <svg id="marr" class="w-4 h-4 text-gray-500 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+            </div>
+            <div id="mbody" class="hidden p-5">
+              <div class="grid grid-cols-2 gap-3">
+                <div><label style="font-size:.6rem" class="block text-gray-500 mb-1">Duct Clearance (mm)</label><input id="i_duct_clearance_mm" type="number" placeholder="e.g. 150" class="inp"/></div>
+                <div><label style="font-size:.6rem" class="block text-gray-500 mb-1">Supply Air Temp (°C)</label><input id="i_supply_air_temp_c" type="number" placeholder="e.g. 14" class="inp"/></div>
+                <div><label style="font-size:.6rem" class="block text-gray-500 mb-1">Fresh Air Rate (%)</label><input id="i_fresh_air_rate_percent" type="number" placeholder="e.g. 12" class="inp"/></div>
+                <div><label style="font-size:.6rem" class="block text-gray-500 mb-1">Panel Spacing (mm)</label><input id="i_panel_spacing_mm" type="number" placeholder="e.g. 800" class="inp"/></div>
+                <div><label style="font-size:.6rem" class="block text-gray-500 mb-1">Cable Tray Fill (%)</label><input id="i_cable_tray_fill_percent" type="number" placeholder="e.g. 55" class="inp"/></div>
+                <div><label style="font-size:.6rem" class="block text-gray-500 mb-1">Hot Water Temp (°C)</label><input id="i_hot_water_temp_c" type="number" placeholder="e.g. 58" class="inp"/></div>
+                <div><label style="font-size:.6rem" class="block text-gray-500 mb-1">Cold Water Pressure (kPa)</label><input id="i_cold_water_pressure_kpa" type="number" placeholder="e.g. 380" class="inp"/></div>
+                <div><label style="font-size:.6rem" class="block text-gray-500 mb-1">Pipe Slope (mm/m)</label><input id="i_pipe_slope_mm_per_m" type="number" placeholder="e.g. 18" class="inp"/></div>
+                <div><label style="font-size:.6rem" class="block text-gray-500 mb-1">Sprinkler Spacing (m)</label><input id="i_sprinkler_spacing_m" type="number" step="0.1" placeholder="e.g. 5.0" class="inp"/></div>
+                <div><label style="font-size:.6rem" class="block text-gray-500 mb-1">Fire Pipe Pressure (kPa)</label><input id="i_fire_pipe_pressure_kpa" type="number" placeholder="e.g. 300" class="inp"/></div>
+              </div>
+              <button onclick="runManual()" class="mt-4 w-full py-2.5 rounded-lg text-sm font-semibold text-white hover:opacity-90" style="background:linear-gradient(135deg,#6366f1,#8b5cf6)">▶ Run AI Compliance Check</button>
+            </div>
+          </div>
+        </div>
+        <div id="rp" class="space-y-4" style="min-height:400px">
+          <div id="rp-idle" class="glass rounded-xl flex flex-col items-center justify-center text-center p-10 h-full" style="min-height:350px">
+            <div class="w-14 h-14 rounded-2xl bg-indigo-600/10 border border-indigo-500/15 flex items-center justify-center mb-4">
+              <svg class="w-7 h-7 text-indigo-400/40" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+            </div>
+            <p class="text-gray-400 font-medium text-sm">AI Report Appears Here</p>
+            <p style="font-size:.68rem" class="text-gray-600 mt-1.5 max-w-xs">Upload a file or enter values on the left</p>
+          </div>
+          <div id="rp-load" class="hidden glass rounded-xl p-6">
+            <div class="flex items-center gap-3 mb-5">
+              <div class="relative w-10 h-10 flex-shrink-0"><div class="absolute inset-0 rounded-full border-2 border-indigo-500/15"></div><div class="absolute inset-0 rounded-full border-2 border-transparent border-t-indigo-500 spin"></div></div>
+              <div><p class="text-white font-semibold text-sm" id="ltit">Uploading…</p><p style="font-size:.67rem" class="text-gray-500" id="lsub">Sending to AI engine</p></div>
+            </div>
+            <div class="space-y-2.5" id="sarea"></div>
+            <div id="scanbox" class="hidden mt-4">
+              <p style="font-size:.6rem" class="text-gray-500 uppercase tracking-wider mb-2">🔍 Parameters Being Extracted</p>
+              <div id="scanrows" class="space-y-1 max-h-36 overflow-y-auto"></div>
+            </div>
+          </div>
+          <div id="rp-res" class="hidden fu"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ FULL REPORT DRILL-DOWN ═══ -->
+    <div id="p-report" class="hidden p-5 fu">
+      <div class="flex items-center justify-between mb-5">
+        <button onclick="goBack()" class="flex items-center gap-2 text-gray-500 hover:text-white text-sm transition-colors">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>Back
+        </button>
+        <div class="flex items-center gap-2">
+          <button onclick="openAttachModal()" class="glass2 text-xs text-indigo-400 hover:text-indigo-300 px-3 py-1.5 rounded-lg flex items-center gap-1.5">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7a2 2 0 012-2h4l2 2h8a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V7z"/></svg>
+            Save to Project
+          </button>
+          <button onclick="toggleChat(true)" class="glass2 text-xs text-indigo-400 hover:text-indigo-300 px-3 py-1.5 rounded-lg flex items-center gap-1.5">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+            Ask AI
+          </button>
+        </div>
+      </div>
+      <div id="report-body"></div>
+    </div>
+
+    <!-- ═══ HISTORY ═══ -->
+    <div id="p-hist" class="hidden p-5">
+      <div class="mb-4 flex items-center justify-between"><p class="text-white font-semibold text-sm">All Compliance Reports</p><button onclick="loadHist()" class="glass2 text-xs text-gray-400 hover:text-white px-3 py-1.5 rounded-lg">Refresh</button></div>
+      <div id="hgrid" class="grid grid-cols-3 gap-4"></div>
+    </div>
+
+    <!-- ═══ PROJECTS ═══ -->
+    <div id="p-projects" class="hidden p-5">
+      <div class="flex items-center justify-between mb-5">
+        <div><p class="text-white font-semibold text-sm">Projects</p><p style="font-size:.67rem" class="text-gray-500 mt-0.5">Organise reports by building or engagement</p></div>
+        <button onclick="document.getElementById('proj-modal').classList.remove('hidden')" class="flex items-center gap-1.5 text-xs font-semibold text-white px-4 py-2 rounded-lg" style="background:linear-gradient(135deg,#6366f1,#8b5cf6)">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>New Project
+        </button>
+      </div>
+      <div id="pgrid" class="grid grid-cols-3 gap-4"></div>
+    </div>
+
+    <!-- ═══ RULES ═══ -->
+    <div id="p-rules" class="hidden p-5">
+      <div class="mb-4 flex items-center gap-3 flex-wrap">
+        <p class="text-white font-semibold text-sm mr-2">Active Code Rules</p>
+        <button onclick="rf('all')" id="rf-all" class="text-xs px-3 py-1 rounded-full bg-indigo-600/25 text-indigo-300 border border-indigo-500/30">All (11)</button>
+        <button onclick="rf('HVAC')" id="rf-HVAC" class="text-xs px-3 py-1 rounded-full glass text-gray-400">HVAC</button>
+        <button onclick="rf('Electrical')" id="rf-Electrical" class="text-xs px-3 py-1 rounded-full glass text-gray-400">Electrical</button>
+        <button onclick="rf('Plumbing')" id="rf-Plumbing" class="text-xs px-3 py-1 rounded-full glass text-gray-400">Plumbing</button>
+        <button onclick="rf('Fire Protection')" id="rf-Fire" class="text-xs px-3 py-1 rounded-full glass text-gray-400">Fire</button>
+      </div>
+      <div id="rgrid" class="grid grid-cols-2 gap-3"></div>
+    </div>
+
+  </div>
+</div>
+</div>
+
+<script>
+// ── State ──────────────────────────────────────────────────────
+let selFile=null, curReport=null, allRules=[], prevPage='dash';
+let authToken=localStorage.getItem('mep_token')||'';
+let authUser=null;
+window.VD=[];
+
+// ── Auth ───────────────────────────────────────────────────────
+function authTab(t){
+  document.getElementById('form-login').classList.toggle('hidden', t!=='login');
+  document.getElementById('form-signup').classList.toggle('hidden', t!=='signup');
+  document.getElementById('tab-login').style.background=t==='login'?'rgba(99,102,241,.35)':'transparent';
+  document.getElementById('tab-login').className='flex-1 py-1.5 rounded-md text-xs font-semibold '+(t==='login'?'text-white':'text-gray-500');
+  document.getElementById('tab-signup').style.background=t==='signup'?'rgba(99,102,241,.35)':'transparent';
+  document.getElementById('tab-signup').className='flex-1 py-1.5 rounded-md text-xs font-semibold '+(t==='signup'?'text-white':'text-gray-500');
+}
+async function doLogin(){
+  const u=document.getElementById('l-user').value.trim(), p=document.getElementById('l-pass').value;
+  const err=document.getElementById('l-err');
+  if(!u||!p){err.textContent='Fill in all fields';err.classList.remove('hidden');return;}
+  try{
+    const r=await fetch('/auth/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:u,password:p})});
+    const d=await r.json();
+    if(!r.ok) throw new Error(d.detail||'Login failed');
+    authToken=d.token; authUser=d.user;
+    localStorage.setItem('mep_token',authToken);
+    err.classList.add('hidden');
+    onAuth();
+  }catch(e){err.textContent=e.message;err.classList.remove('hidden');}
+}
+async function demoLogin(){
+  // Create demo account if it doesn't exist, then log in
+  await fetch('/auth/signup',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:'demo',email:'demo@mep.ai',password:'demo123',full_name:'Demo Engineer'})});
+  document.getElementById('l-user').value='demo';
+  document.getElementById('l-pass').value='demo123';
+  doLogin();
+}
+async function doSignup(){
+  const name=document.getElementById('s-name').value.trim(), user=document.getElementById('s-user').value.trim(), email=document.getElementById('s-email').value.trim(), pass=document.getElementById('s-pass').value;
+  const err=document.getElementById('s-err');
+  if(!user||!email||!pass){err.textContent='Fill in all required fields';err.classList.remove('hidden');return;}
+  try{
+    const r=await fetch('/auth/signup',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:user,email:email,password:pass,full_name:name})});
+    const d=await r.json();
+    if(!r.ok) throw new Error(d.detail||'Signup failed');
+    // auto-login
+    document.getElementById('l-user').value=user; document.getElementById('l-pass').value=pass;
+    authTab('login'); doLogin();
+  }catch(e){err.textContent=e.message;err.classList.remove('hidden');}
+}
+function onAuth(){
+  document.getElementById('auth-overlay').classList.add('hidden');
+  const initials=(authUser?.full_name||authUser?.username||'U').slice(0,2).toUpperCase();
+  document.getElementById('u-av').textContent=initials;
+  document.getElementById('u-name').textContent=authUser?.full_name||authUser?.username||'User';
+  document.getElementById('u-role').textContent=authUser?.role||'engineer';
+  loadDash(); updateBadge();
+}
+async function doLogout(){
+  await fetch('/auth/logout',{method:'POST',headers:{'Authorization':'Bearer '+authToken}}).catch(()=>{});
+  authToken=''; authUser=null;
+  localStorage.removeItem('mep_token');
+  document.getElementById('auth-overlay').classList.remove('hidden');
+}
+async function checkAuth(){
+  if(!authToken){document.getElementById('auth-overlay').classList.remove('hidden');return;}
+  try{
+    const r=await fetch('/auth/me',{headers:{'Authorization':'Bearer '+authToken}});
+    if(!r.ok) throw new Error();
+    const d=await r.json(); authUser=d.user; onAuth();
+  }catch(e){document.getElementById('auth-overlay').classList.remove('hidden');}
+}
+
+// ── Nav ────────────────────────────────────────────────────────
+const PAGES=['dash','check','report','hist','projects','rules'];
+function pg(name){
+  PAGES.forEach(p=>{
+    const el=document.getElementById('p-'+p); if(el) el.classList.add('hidden');
+    const n=document.getElementById('n-'+p); if(n) n.classList.remove('act');
+  });
+  document.getElementById('p-'+name).classList.remove('hidden');
+  const n=document.getElementById('n-'+name); if(n) n.classList.add('act');
+  const T={dash:['Dashboard','System overview'],check:['Run Check','Upload or enter values — AI analyses instantly'],report:['Full Report','Complete violation drill-down with AI explanations'],hist:['Report History','All past compliance checks'],projects:['Projects','Organise reports by building or engagement'],rules:['Code Rules','Active ASHRAE · NEC · IPC · NFPA rules']};
+  document.getElementById('ptit').textContent=(T[name]||['',''])[0];
+  document.getElementById('psub').textContent=(T[name]||['',''])[1];
+  const chatBtn=document.getElementById('chat-toggle');
+  if(name==='report') chatBtn.classList.remove('hidden'); else { chatBtn.classList.add('hidden'); toggleChat(false); }
+  if(name==='hist') loadHist();
+  if(name==='rules') loadRules();
+  if(name==='dash') loadDash();
+  if(name==='projects') loadProjects();
+}
+function goBack(){ toggleChat(false); pg(prevPage); }
+
+// ── Drop zone ──────────────────────────────────────────────────
+function dzev(e,t){e.preventDefault();const d=document.getElementById('dz');t==='on'?d.classList.add('on'):t==='off'?d.classList.remove('on'):(d.classList.remove('on'),pickF({target:{files:e.dataTransfer.files}}));}
+function pickF(e){
+  const f=e.target.files[0]; if(!f) return;
+  selFile=f;
+  document.getElementById('fext').textContent=f.name.split('.').pop().toUpperCase();
+  document.getElementById('fname').textContent=f.name;
+  document.getElementById('fsize').textContent=(f.size/1024).toFixed(1)+' KB';
+  document.getElementById('fchip').classList.remove('hidden');
+  const b=document.getElementById('rbtn');
+  b.disabled=false; b.style.cssText='background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;cursor:pointer';
+  b.textContent='▶  Run AI Compliance Check';
+}
+function clrF(){
+  selFile=null; document.getElementById('fi').value='';
+  document.getElementById('fchip').classList.add('hidden');
+  const b=document.getElementById('rbtn');
+  b.disabled=true; b.style.cssText='background:rgba(99,102,241,.15);color:#4b5563;cursor:not-allowed';
+  b.textContent='Select a file to continue';
+}
+
+// ── Steps ──────────────────────────────────────────────────────
+const STEP_LABELS=['File received & validated','Document intelligence scan','AI extracting MEP parameters','Cross-referencing 11 code rules','Computing risk score','Generating AI fix suggestions'];
+function initSteps(){
+  document.getElementById('sarea').innerHTML=STEP_LABELS.map((s,i)=>`<div class="step wait" id="st${i}"><div class="dot"></div><span class="lbl">${s}</span></div>`).join('');
+}
+function setStep(n,state){
+  const el=document.getElementById('st'+n); if(!el) return;
+  el.className='step '+state;
+  const icons={done:'<svg class="w-2.5 h-2.5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>',act:'<svg class="w-2.5 h-2.5 text-indigo-400 spin" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" stroke-width="2" stroke-dasharray="28" stroke-dashoffset="10"/></svg>',wait:'<svg class="w-2.5 h-2.5" fill="currentColor" style="color:#374151" viewBox="0 0 8 8"><circle cx="4" cy="4" r="3"/></svg>'};
+  el.querySelector('.dot').innerHTML=icons[state]||icons.wait;
+}
+
+// ── Scan animation ─────────────────────────────────────────────
+function showScan(params, violations){
+  document.getElementById('scanbox').classList.remove('hidden');
+  const sr=document.getElementById('scanrows'); sr.innerHTML='';
+  const vSet=new Set((violations||[]).map(v=>v.parameter));
+  const entries=Object.entries(params||{}).filter(([k,v])=>k!=='_meta'&&typeof v!=='object');
+  let i=0;
+  (function next(){
+    if(i>=entries.length) return;
+    const[k,val]=entries[i++];
+    const fail=vSet.has(k);
+    const row=document.createElement('div');
+    row.className=`flex items-center justify-between px-2 py-1 rounded text-xs ${fail?'scan-fail':'scan-pass'}`;
+    row.innerHTML=`<span class="text-gray-400 font-mono">${k.replace(/_/g,' ')}</span><div class="flex items-center gap-2"><span class="${fail?'text-red-300':'text-green-300'} font-bold font-mono">${val}</span><span class="text-xs px-1 py-0.5 rounded ${fail?'bg-red-500/20 text-red-400':'bg-green-500/20 text-green-400'}">${fail?'FAIL':'PASS'}</span></div>`;
+    sr.appendChild(row);
+    setTimeout(next, 200);
+  })();
+}
+
+// ── Run check ──────────────────────────────────────────────────
+async function runCheck(){
+  if(!selFile) return;
+  prevPage='check';
+  show('rp-load'); hide('rp-idle'); hide('rp-res');
+  initSteps(); document.getElementById('scanbox').classList.add('hidden');
+  setStep(0,'act'); ldt('Uploading file…','Sending to AI engine');
+  try{
+    const form=new FormData(); form.append('file',selFile);
+    const up=await fetch('/upload/',{method:'POST',body:form});
+    if(!up.ok) throw new Error((await up.json()).detail||'Upload failed');
+    const ud=await up.json();
+    setStep(0,'done'); setStep(1,'act'); ldt('Document intelligence scan…','Detecting format & document type');
+    await w(400); setStep(1,'done'); setStep(2,'act'); ldt('AI extracting parameters…','Parsing MEP spec data');
+    await w(300); setStep(2,'done'); setStep(3,'act'); ldt('Cross-referencing code rules…','ASHRAE · NEC · IPC · NFPA');
+    const rep=await fetch('/compliance/report?filename='+encodeURIComponent(ud.filename));
+    if(!rep.ok){ const e=await rep.json(); throw new Error(typeof e.detail==='object'?e.detail.message:e.detail); }
+    const data=await rep.json(); curReport=data;
+    showScan(data.extracted_parameters, data.violations);
+    await w(300); setStep(3,'done'); setStep(4,'act'); ldt('Computing risk score…','');
+    await w(350); setStep(4,'done'); setStep(5,'act'); ldt('Generating AI explanations…','');
+    await w(300); setStep(5,'done');
+    await w(400);
+    hide('rp-load'); renderCompact(data); updateBadge();
+  }catch(e){ hide('rp-load'); show('rp-idle'); alert('Error: '+e.message); }
+}
+
+const MFLDS=['duct_clearance_mm','supply_air_temp_c','fresh_air_rate_percent','panel_spacing_mm','cable_tray_fill_percent','hot_water_temp_c','cold_water_pressure_kpa','pipe_slope_mm_per_m','sprinkler_spacing_m','fire_pipe_pressure_kpa'];
+async function runManual(){
+  const p={}; MFLDS.forEach(k=>{ const v=document.getElementById('i_'+k)?.value; if(v) p[k]=parseFloat(v); });
+  if(!Object.keys(p).length){ alert('Enter at least one value.'); return; }
+  prevPage='check';
+  show('rp-load'); hide('rp-idle'); hide('rp-res');
+  initSteps(); document.getElementById('scanbox').classList.add('hidden');
+  setStep(0,'act'); ldt('Preparing entry…','');
+  try{
+    const blob=new Blob([JSON.stringify(p)],{type:'application/json'});
+    const file=new File([blob],'manual_entry.json',{type:'application/json'});
+    const form=new FormData(); form.append('file',file);
+    await fetch('/upload/',{method:'POST',body:form});
+    setStep(0,'done'); setStep(1,'done'); setStep(2,'act'); ldt('Running compliance check…','');
+    const rep=await fetch('/compliance/report?filename=manual_entry.json');
+    if(!rep.ok) throw new Error('Check failed');
+    const data=await rep.json(); curReport=data;
+    showScan(data.extracted_parameters, data.violations);
+    await w(600); [2,3,4,5].forEach(n=>setStep(n,'done'));
+    await w(400);
+    hide('rp-load'); renderCompact(data); updateBadge();
+  }catch(e){ hide('rp-load'); show('rp-idle'); alert('Error: '+e.message); }
+}
+
+// ── Compact right-panel result ─────────────────────────────────
+function renderCompact(data){
+  show('rp-res');
+  const lk=rk(data.risk_level), c=col(lk);
+  const src=data.source==='manual'?'📝 Manual Entry':'📄 File Upload';
+  const meta=data.extracted_parameters?._meta||{};
+  const el=document.getElementById('rp-res');
+  el.innerHTML=`
+    <div class="glass rounded-xl p-5">
+      <div class="flex items-start gap-4 mb-4">
+        <div class="relative flex-shrink-0" style="width:78px;height:78px">
+          <svg class="w-full h-full" style="transform:rotate(-90deg)" viewBox="0 0 36 36">
+            <circle cx="18" cy="18" r="14" fill="none" stroke="rgba(255,255,255,.06)" stroke-width="3"/>
+            <circle id="cr" cx="18" cy="18" r="14" fill="none" stroke="${c}" stroke-width="3" stroke-dasharray="0 87.96" stroke-linecap="round" class="ring-anim"/>
+          </svg>
+          <div class="absolute inset-0 flex flex-col items-center justify-center"><span class="text-xl font-bold text-white">${data.risk_score}</span><span style="font-size:.48rem" class="text-gray-500">/100</span></div>
+        </div>
+        <div class="flex-1 min-w-0">
+          <div class="flex items-center gap-2 mb-1.5 flex-wrap">
+            <span class="text-xs font-bold px-2.5 py-1 rounded-full" style="background:${c}22;color:${c};border:1px solid ${c}44">${data.risk_level}</span>
+            <span style="font-size:.66rem" class="glass px-2 py-0.5 rounded text-gray-400">${src}</span>
+          </div>
+          <p class="text-white font-semibold text-sm truncate">${data.file}</p>
+          <div class="flex gap-3 mt-1.5">
+            <span style="font-size:.7rem" class="text-red-400 font-medium">${data.violation_count} violations</span>
+            <span style="font-size:.7rem" class="text-green-400 font-medium">${data.compliant_count} compliant</span>
+          </div>
+        </div>
+      </div>
+      ${meta.format?`<div class="glass2 rounded-lg px-3 py-2 mb-3 flex items-center gap-3 flex-wrap">
+        <span style="font-size:.62rem" class="text-indigo-300 font-mono font-semibold">${meta.format}</span>
+        <span class="text-gray-700">·</span>
+        <span style="font-size:.62rem" class="text-gray-400">${meta.document_type||'MEP'}</span>
+        <span class="text-gray-700">·</span>
+        <span style="font-size:.62rem" class="text-gray-400">${meta.fields_found||0} fields extracted</span>
+        ${meta.pages?`<span class="text-gray-700">·</span><span style="font-size:.62rem" class="text-gray-400">${meta.pages} pages</span>`:''}
+        <span class="ml-auto px-1.5 py-0.5 rounded text-xs ${meta.confidence==='high'?'bg-green-500/20 text-green-400':meta.confidence==='medium'?'bg-yellow-500/20 text-yellow-400':'bg-red-500/20 text-red-400'}">${meta.confidence||'—'} confidence</span>
+      </div>`:''}
+      ${meta.needs_ocr?`<div class="bg-yellow-500/10 border border-yellow-500/30 rounded-lg px-3 py-2 mb-3 text-xs text-yellow-300">⚠ Scanned PDF detected — OCR required for complete extraction. Convert to searchable PDF for best results.</div>`:''}
+      <div class="ai-bub mb-4">
+        <div class="flex items-center gap-1.5 mb-2"><div class="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0" style="background:linear-gradient(135deg,#6366f1,#8b5cf6);font-size:.5rem;font-weight:700;color:#fff">AI</div><span style="font-size:.6rem" class="text-indigo-300 font-semibold uppercase tracking-wider">AI Assessment</span></div>
+        <p style="font-size:.74rem" class="text-gray-200 leading-relaxed">${data.summary}</p>
+      </div>
+      ${data.violations.length ? `<div class="mb-4 space-y-1.5">${data.violations.map((v,i)=>`
+        <div class="flex items-center justify-between px-3 py-2 rounded-lg" style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06)">
+          <div class="flex items-center gap-2"><span class="w-2 h-2 rounded-full flex-shrink-0" style="background:${col(rk(v.severity+' RISK'))}"></span><span style="font-size:.72rem" class="text-gray-300">${v.rule}</span></div>
+          <div class="flex items-center gap-2"><span style="font-size:.68rem" class="text-red-300 font-mono">${v.found}${v.unit}</span><span class="badge-${v.severity} text-xs px-1.5 py-0.5 rounded" style="font-size:.58rem">${v.severity}</span></div>
+        </div>`).join('')}</div>` : ''}
+      <button onclick="openFullReport(curReport)" class="w-full py-2.5 rounded-lg text-sm font-semibold text-white flex items-center justify-center gap-2 hover:opacity-90" style="background:linear-gradient(135deg,#6366f1,#8b5cf6)">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+        Open Full Drill-Down Report
+      </button>
+    </div>`;
+  setTimeout(()=>{ const r=document.getElementById('cr'); if(r){ const v=data.risk_score/100*87.96; r.style.strokeDasharray=v+' '+(87.96-v); }},80);
+}
+
+// ── Remediation steps per rule ─────────────────────────────────
+const REMEDIATION={
+  'HVAC-001':['Shut down affected AHU/duct section for safe access','Measure existing clearance with calibrated tape across all four sides','Reroute duct or remove encroaching structure to achieve ≥300mm clearance','Re-insulate duct where insulation was disturbed','Commission a licensed MEP engineer to sign off revised as-built drawing'],
+  'HVAC-002':['Access AHU controls panel and locate discharge air temperature setpoint','Recalibrate setpoint to 16–22°C under all load conditions','Run Test, Adjust and Balance (TAB) at full load, 50% load, and minimum load','Record temperatures at supply grilles across all zones','Submit TAB report to engineer of record for approval'],
+  'HVAC-003':['Inspect outdoor air intake damper size and actuator calibration','Re-size damper or replace actuator to deliver ≥15% outdoor air at design flow','Verify CO₂ sensors are operational in all occupied zones','Run TAB confirming outdoor air fraction at full and minimum ventilation modes','Issue updated ventilation schedule stamped by a licensed mechanical engineer'],
+  'ELEC-001':['Isolate panel from supply — do not work on live equipment','Measure clear working space depth, width, and height in front of panel','Relocate panel or remove all encroachments to achieve ≥1000mm clear depth','Verify 2000mm headroom is maintained throughout working space','Obtain licensed electrician sign-off and update as-built electrical drawings'],
+  'ELEC-002':['Perform cable tray fill audit — count and measure all conductors per NEC 392.22(A)','Redistribute cables to adjacent under-utilised tray sections','Install additional tray sections where redistribution is not feasible','Recalculate fill percentages per NEC Chapter 9 Table 1 for all spans','Submit corrected fill calculations to engineer of record for approval'],
+  'ELEC-003':['Identify all conduit runs using undersized conduit','Remove and replace with conduit of correct minimum diameter (≥16mm)','Pull new conductors through replacement conduit','Verify fill ratios comply with NEC Chapter 9 Table 1','Obtain electrical inspector sign-off before energising circuits'],
+  'PLMB-001':['CCTV survey drain to locate all flat or reverse-gradient sections','Excavate and re-pitch affected drain run to achieve ≥20mm/m grade','Adjust invert levels or reroute to lower connection point where needed','Backfill and re-instate finished floor after re-pitching','Conduct post-repair CCTV inspection to confirm continuous grade'],
+  'PLMB-002':['Raise water heater thermostat setpoint to ≥60°C','Verify thermostatic mixing valves (TMVs) are set ≤50°C at all point-of-use fixtures','Conduct Legionella risk assessment across the full system','Flush all dead-legs and infrequently used outlets for ≥5 minutes','Record water temperatures at all outlets and submit Legionella risk log before commissioning'],
+  'PLMB-003':['Install a calibrated pressure gauge at the point of concern','Measure supply pressure at both peak and off-peak demand','Install pressure-reducing valve (PRV) upstream if pressure exceeds 500kPa, or booster pump if below 200kPa','Verify pressure at most remote and most proximate fixture under full demand','Document corrected pressure readings and submit to engineer of record'],
+  'FIRE-001':['Engage licensed fire protection engineer to review sprinkler layout','Calculate required coverage area per NFPA 13 §8.6.2 for the hazard classification','Install additional heads to reduce spacing to ≤4.6m in all directions','Do not close any ceiling until the revised layout is approved by the AHJ','Obtain fire marshal witness of system acceptance test before commissioning'],
+  'FIRE-002':['Engage hydraulic calculation specialist to identify pressure deficiency','Upsize fire pump, re-impeller, or upgrade supply connection to achieve ≥350kPa at remote head','Conduct flow test with fire marshal present','Submit revised hydraulic calculations to AHJ for review','Obtain written sign-off from fire marshal before system is placed in service'],
+};
+
+const FIX_TIME={'CRITICAL':'1–2 weeks','HIGH':'1–3 weeks','MEDIUM':'3–7 days','LOW':'1–3 days'};
+const FIX_COST={'CRITICAL':'$15,000–$50,000+','HIGH':'$5,000–$15,000','MEDIUM':'$1,000–$5,000','LOW':'$200–$1,000'};
+
+// ── Full Report Page ───────────────────────────────────────────
+function openFullReport(data){
+  if(!data){ alert('No report data.'); return; }
+  curReport=data; toggleChat(false);
+  window.VD=[];
+  (data.violations||[]).forEach((v,i)=>{
+    const s=(data.suggestions||[])[i]||{};
+    window.VD[i]={ explanation: s.ai_explanation||v.rule+' requires immediate attention per '+v.code_reference, fix: s.suggestion||'Adjust value to meet code requirement.' };
+  });
+
+  const lk=rk(data.risk_level), c=col(lk);
+  const src=data.source==='manual'?'📝 Manual Entry':'📄 File Upload';
+  const meta=(data.extracted_parameters||{})?._meta||{};
+  const params=Object.entries(data.extracted_parameters||{}).filter(([k,v])=>k!=='_meta'&&typeof v!=='object');
+  const vSet=new Set((data.violations||[]).map(v=>v.parameter));
+  const ruleMap={};
+  (data.violations||[]).forEach(v=>{ ruleMap[v.parameter]=v; });
+
+  let violHTML='';
+  if(!data.violations||!data.violations.length){
+    violHTML=`<div class="glass rounded-xl p-6 text-center text-green-400 text-sm flex items-center justify-center gap-3"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>All parameters fully compliant — zero violations detected.</div>`;
+  } else {
+    violHTML=data.violations.map((v,i)=>{
+      const c2=col(v.severity);
+      const gap=v.required_min!=null?Math.abs(v.required_min-v.found):v.required_max!=null?Math.abs(v.found-v.required_max):0;
+      const pct=v.required_min!=null?Math.min(100,(v.found/v.required_min)*100):v.required_max!=null?Math.min(100,(v.required_max/v.found)*100):50;
+      const steps=REMEDIATION[v.rule_id]||['Engage relevant subcontractor','Measure and verify the non-compliant value on site','Execute corrective work to meet code requirement','Re-measure to confirm compliance','Submit as-built documentation for sign-off'];
+      const stepsHTML=steps.map((s,si)=>`<div class="chk-item"><input type="checkbox" id="chk_${i}_${si}"/><label for="chk_${i}_${si}" style="font-size:.7rem" class="text-gray-300 cursor-pointer leading-relaxed">${s}</label></div>`).join('');
+
+      return `<div class="sev-${v.severity} rounded-xl overflow-hidden" id="vcard${i}">
+        <div class="p-5">
+          <!-- Header -->
+          <div class="flex items-start justify-between gap-3 mb-4">
+            <div>
+              <div class="flex items-center gap-2 mb-1.5 flex-wrap">
+                <span class="badge-${v.severity} text-xs px-2 py-0.5 rounded">${v.severity}</span>
+                <span style="font-size:.62rem" class="font-mono text-gray-400 bg-white/5 px-2 py-0.5 rounded">${v.code_reference}</span>
+                <span style="font-size:.62rem" class="text-gray-500">${v.category}</span>
+              </div>
+              <h3 class="text-white font-bold text-sm">${v.rule}</h3>
+              <p style="font-size:.65rem" class="text-gray-500 mt-0.5 font-mono">parameter: ${v.parameter.replace(/_/g,' ')}</p>
+            </div>
+            <div class="text-right flex-shrink-0">
+              <p style="font-size:.58rem" class="text-gray-600">Fix time</p>
+              <p style="font-size:.68rem;color:${c2}" class="font-semibold">${FIX_TIME[v.severity]||'TBD'}</p>
+              <p style="font-size:.56rem" class="text-gray-600 mt-0.5">Est. cost</p>
+              <p style="font-size:.62rem" class="text-gray-400">${FIX_COST[v.severity]||'TBD'}</p>
+            </div>
+          </div>
+
+          <!-- Value comparison -->
+          <div class="glass2 rounded-xl p-4 mb-4">
+            <div class="grid grid-cols-3 gap-3 mb-4">
+              <div class="text-center">
+                <p style="font-size:.58rem" class="text-gray-500 uppercase tracking-wider mb-2">Found in Spec</p>
+                <div class="w-16 h-16 rounded-full border-2 border-red-500/50 bg-red-500/10 flex flex-col items-center justify-center mx-auto">
+                  <span class="text-xl font-bold text-red-400">${v.found}</span>
+                  <span style="font-size:.5rem" class="text-gray-500">${v.unit}</span>
+                </div>
+              </div>
+              <div class="flex flex-col items-center justify-center gap-1">
+                <div class="text-2xl text-gray-700">≠</div>
+                <p style="font-size:.62rem;color:${c2}" class="text-center font-semibold">Gap: ${gap.toFixed(1)}${v.unit}</p>
+                <p style="font-size:.55rem" class="text-gray-600 text-center">${v.required_min!=null?'must increase':'must reduce'}</p>
+              </div>
+              <div class="text-center">
+                <p style="font-size:.58rem" class="text-gray-500 uppercase tracking-wider mb-2">${v.required_min!=null?'Min Required':'Max Allowed'}</p>
+                <div class="w-16 h-16 rounded-full border-2 border-green-500/50 bg-green-500/10 flex flex-col items-center justify-center mx-auto">
+                  <span class="text-xl font-bold text-green-400">${v.required_min!=null?v.required_min:v.required_max}</span>
+                  <span style="font-size:.5rem" class="text-gray-500">${v.unit}</span>
+                </div>
+              </div>
+            </div>
+            <div>
+              <div class="flex justify-between mb-1.5"><span style="font-size:.6rem" class="text-gray-500">Compliance level</span><span style="font-size:.6rem;color:${c2}">${Math.round(pct)}% of requirement met</span></div>
+              <div class="pbar"><div class="pbar-fill" id="pb${i}" style="width:0%;background:${c2}"></div></div>
+            </div>
+          </div>
+
+          <!-- AI Explanation -->
+          <div class="space-y-3 mb-4">
+            <div class="flex items-start gap-3">
+              <div class="w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5" style="background:linear-gradient(135deg,#6366f1,#8b5cf6);font-size:.5rem;font-weight:700;color:#fff">AI</div>
+              <div class="flex-1">
+                <div class="flex items-center justify-between mb-1.5">
+                  <p style="font-size:.6rem" class="text-indigo-300 font-semibold uppercase tracking-wider">Why This Failed</p>
+                  <button onclick="reExplain(${i})" class="text-indigo-400 hover:text-indigo-300 flex items-center gap-1" style="font-size:.62rem">
+                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>Re-explain
+                  </button>
+                </div>
+                <div class="ai-bub"><p id="exp${i}" class="text-gray-200 leading-relaxed" style="font-size:.74rem"></p></div>
+              </div>
+            </div>
+            <div class="flex items-start gap-3">
+              <div class="w-6 h-6 rounded-full bg-green-600/25 border border-green-500/30 flex items-center justify-center flex-shrink-0 mt-0.5">
+                <svg class="w-3 h-3 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+              </div>
+              <div class="flex-1">
+                <p style="font-size:.6rem" class="text-green-400 font-semibold uppercase tracking-wider mb-1.5">Suggested Fix</p>
+                <div class="fix-bub"><p id="fix${i}" class="text-gray-200 leading-relaxed" style="font-size:.74rem"></p></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Remediation checklist -->
+          <div class="glass rounded-xl p-4">
+            <div class="flex items-center justify-between mb-3">
+              <p style="font-size:.6rem" class="text-gray-400 uppercase tracking-wider font-semibold">Remediation Steps</p>
+              <span style="font-size:.58rem" class="text-gray-600">Check off as completed</span>
+            </div>
+            <div class="space-y-0.5">${stepsHTML}</div>
+          </div>
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  document.getElementById('report-body').innerHTML=`
+    <!-- Header -->
+    <div class="glass rounded-2xl p-6 mb-5">
+      <div class="flex items-start gap-5">
+        <div class="relative flex-shrink-0" style="width:90px;height:90px">
+          <svg class="w-full h-full" style="transform:rotate(-90deg)" viewBox="0 0 36 36">
+            <circle cx="18" cy="18" r="14" fill="none" stroke="rgba(255,255,255,.06)" stroke-width="3.5"/>
+            <circle id="rring" cx="18" cy="18" r="14" fill="none" stroke="${c}" stroke-width="3.5" stroke-dasharray="0 87.96" stroke-linecap="round" class="ring-anim"/>
+          </svg>
+          <div class="absolute inset-0 flex flex-col items-center justify-center"><span class="text-2xl font-bold text-white">${data.risk_score}</span><span style="font-size:.48rem" class="text-gray-500">/100</span></div>
+        </div>
+        <div class="flex-1 min-w-0">
+          <div class="flex items-center gap-2 mb-2 flex-wrap">
+            <span class="font-bold px-3 py-1 rounded-full text-sm" style="background:${c}22;color:${c};border:1px solid ${c}44">${data.risk_level}</span>
+            <span style="font-size:.7rem" class="glass px-2 py-1 rounded text-gray-400">${src}</span>
+          </div>
+          <h2 class="text-white font-bold text-lg mb-1.5">${data.file}</h2>
+          <div class="flex items-center gap-5 flex-wrap">
+            <span class="text-red-400 font-semibold text-sm">${data.violation_count} violations detected</span>
+            <span class="text-green-400 font-semibold text-sm">${data.compliant_count} parameters compliant</span>
+            <span class="text-gray-500 text-sm">${params.length} parameters extracted</span>
+          </div>
+        </div>
+        <button onclick="dlR()" class="glass2 text-xs text-gray-400 hover:text-white px-3 py-2 rounded-lg flex items-center gap-1.5 transition-colors flex-shrink-0">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>Export JSON
+        </button>
+      </div>
+    </div>
+
+    <!-- Document Intelligence -->
+    ${meta.format?`<div class="glass rounded-xl p-4 mb-5">
+      <p style="font-size:.62rem" class="text-gray-500 uppercase tracking-wider mb-3 font-semibold">📄 Document Intelligence Report</p>
+      <div class="grid grid-cols-4 gap-3">
+        <div class="glass2 rounded-lg p-3 text-center"><p style="font-size:.58rem" class="text-gray-500 mb-1">Format</p><p class="text-white font-bold text-sm">${meta.format}</p></div>
+        <div class="glass2 rounded-lg p-3 text-center"><p style="font-size:.58rem" class="text-gray-500 mb-1">Document Type</p><p class="text-white font-bold text-sm">${meta.document_type||'—'}</p></div>
+        <div class="glass2 rounded-lg p-3 text-center"><p style="font-size:.58rem" class="text-gray-500 mb-1">Fields Extracted</p><p class="text-white font-bold text-sm">${meta.fields_found||0}<span class="text-gray-500 font-normal text-xs">/${meta.total_possible||11}</span></p></div>
+        <div class="glass2 rounded-lg p-3 text-center"><p style="font-size:.58rem" class="text-gray-500 mb-1">Confidence</p><p class="font-bold text-sm ${meta.confidence==='high'?'text-green-400':meta.confidence==='medium'?'text-yellow-400':'text-red-400'}">${(meta.confidence||'—').toUpperCase()}</p></div>
+      </div>
+      ${meta.needs_ocr?`<div class="mt-3 bg-yellow-500/10 border border-yellow-500/30 rounded-lg px-3 py-2 text-xs text-yellow-300">⚠ Scanned PDF — ${meta.ocr_hint||'OCR required for complete extraction.'}</div>`:''}
+      ${meta.method?`<p style="font-size:.58rem" class="text-gray-600 mt-2">Extraction method: <span class="font-mono text-gray-500">${meta.method}</span>${meta.pages?' · '+meta.pages+' pages scanned':''}</p>`:''}
+    </div>`:''}
+
+    <!-- AI Assessment -->
+    <div class="glass rounded-xl p-5 mb-5">
+      <div class="flex items-center gap-2 mb-3"><div class="w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0" style="background:linear-gradient(135deg,#6366f1,#8b5cf6);font-size:.5rem;font-weight:700;color:#fff">AI</div><p style="font-size:.62rem" class="text-indigo-300 font-semibold uppercase tracking-wider">AI Compliance Assessment</p></div>
+      <div class="ai-bub"><p class="text-gray-200 leading-relaxed text-sm">${data.summary}</p></div>
+    </div>
+
+    <!-- Two-column layout -->
+    <div class="grid gap-5" style="grid-template-columns:280px 1fr">
+      <!-- Input data -->
+      <div>
+        <p style="font-size:.62rem" class="text-gray-500 uppercase tracking-wider font-semibold mb-3">📥 Input Data Checked</p>
+        <div class="glass rounded-xl overflow-hidden">
+          ${params.length ? params.map(([k,val])=>{ const fail=vSet.has(k); const rv=ruleMap[k]; const req=rv?(rv.required_min!=null&&rv.required_max!=null?`${rv.required_min}–${rv.required_max}`:rv.required_min!=null?`≥${rv.required_min}`:rv.required_max!=null?`≤${rv.required_max}`:'—'):'—';
+            return `<div class="flex items-center justify-between px-3 py-2.5 border-b border-white/4 last:border-0 ${fail?'bg-red-500/5':''}">
+              <div class="min-w-0 flex-1"><div class="flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full flex-shrink-0 ${fail?'bg-red-500':'bg-green-500'}"></span><span style="font-size:.68rem" class="text-gray-400 truncate">${k.replace(/_/g,' ')}</span></div><span style="font-size:.58rem" class="text-gray-600 ml-3">${req} ${rv?rv.unit:''}</span></div>
+              <div class="flex items-center gap-1.5 flex-shrink-0 ml-2"><span style="font-size:.7rem" class="text-white font-mono font-bold">${val}</span><span style="font-size:.58rem" class="px-1.5 py-0.5 rounded ${fail?'bg-red-500/20 text-red-400':'bg-green-500/20 text-green-400'}">${fail?'FAIL':'PASS'}</span></div>
+            </div>`;}).join('')
+          : '<div class="px-3 py-4 text-gray-500 text-xs text-center">No parameters extracted</div>'}
+        </div>
+      </div>
+      <!-- Violations -->
+      <div>
+        <p style="font-size:.62rem" class="text-gray-500 uppercase tracking-wider font-semibold mb-3">🚨 Violations — AI Drill-Down + Remediation</p>
+        <div class="space-y-4">${violHTML}</div>
+      </div>
+    </div>`;
+
+  pg('report');
+  setTimeout(()=>{ const r=document.getElementById('rring'); if(r){ const v=data.risk_score/100*87.96; r.style.strokeDasharray=v+' '+(87.96-v); }},100);
+  setTimeout(()=>{
+    (data.violations||[]).forEach((v,i)=>{
+      const pct=v.required_min!=null?Math.min(100,(v.found/v.required_min)*100):v.required_max!=null?Math.min(100,(v.required_max/v.found)*100):50;
+      const el=document.getElementById('pb'+i); if(el) el.style.width=pct+'%';
+    });
+    (data.violations||[]).forEach((v,i)=>{
+      const d=window.VD[i]||{};
+      setTimeout(()=>{
+        typewrite('exp'+i, d.explanation||'', 12, ()=>{
+          document.getElementById('exp'+i)?.classList.remove('tw-cur');
+          setTimeout(()=>typewrite('fix'+i, d.fix||'', 10, ()=>{ document.getElementById('fix'+i)?.classList.remove('tw-cur'); }), 150);
+        });
+        document.getElementById('exp'+i)?.classList.add('tw-cur');
+      }, i * 900);
+    });
+  }, 300);
+
+  // Load chat context
+  initChat(data);
+}
+
+function reExplain(i){
+  const d=window.VD[i]||{};
+  const expEl=document.getElementById('exp'+i), fixEl=document.getElementById('fix'+i);
+  if(expEl){ expEl.textContent=''; expEl.classList.add('tw-cur'); }
+  if(fixEl){ fixEl.textContent=''; }
+  typewrite('exp'+i, d.explanation||'', 12, ()=>{
+    document.getElementById('exp'+i)?.classList.remove('tw-cur');
+    setTimeout(()=>{ if(fixEl){fixEl.classList.add('tw-cur');} typewrite('fix'+i, d.fix||'', 10, ()=>document.getElementById('fix'+i)?.classList.remove('tw-cur')); }, 150);
+  });
+}
+
+// ── Typewriter ─────────────────────────────────────────────────
+function typewrite(id, text, speed, cb){
+  const el=document.getElementById(id); if(!el||!text) return;
+  let i=0;
+  (function tick(){ el.textContent=text.slice(0,i++); if(i<=text.length) setTimeout(tick,speed); else if(cb) cb(); })();
+}
+
+// ── AI Chat Panel ──────────────────────────────────────────────
+const CHAT_QA = [
+  { q:'What is the most critical issue?',
+    a: (r)=>`The most critical issue is <strong>${r.violations[0]?.rule||'—'}</strong> (${r.violations[0]?.severity||''} severity, ${r.violations[0]?.code_reference||''}). The measured value of ${r.violations[0]?.found}${r.violations[0]?.unit} is non-compliant and must be addressed before any permits can be signed off.` },
+  { q:'How long will remediation take?',
+    a: (r)=>{ const crit=(r.violations||[]).filter(v=>v.severity==='CRITICAL').length, high=(r.violations||[]).filter(v=>v.severity==='HIGH').length; return `Based on ${r.violation_count} violation(s) — ${crit} critical and ${high} high — expect <strong>${crit>0?'3–6 weeks':high>0?'2–4 weeks':'1–2 weeks'}</strong> for full remediation assuming subcontractor availability. Critical items must be sequenced first before re-inspection.`; } },
+  { q:'What is the cost impact?',
+    a: (r)=>{ const crit=(r.violations||[]).filter(v=>v.severity==='CRITICAL').length; return `Estimated total remediation cost: <strong>${crit>0?'$30,000–$80,000+':r.violation_count>3?'$15,000–$35,000':'$5,000–$15,000'}</strong>. This is an order-of-magnitude estimate — get trade-specific quotes from the MEP subcontractors. Delaying remediation risks permit hold and potential stop-work orders.`; } },
+  { q:'Can we get a permit with these violations?',
+    a: (r)=>{ const crit=(r.violations||[]).filter(v=>v.severity==='CRITICAL').length, high=(r.violations||[]).filter(v=>v.severity==='HIGH').length; return crit>0?`<strong>No.</strong> ${crit} CRITICAL life-safety violation(s) will result in permit refusal. These must be fully resolved and re-inspected before any occupancy or commissioning permit can be issued.`:high>0?`<strong>Unlikely.</strong> ${high} HIGH severity violation(s) typically require correction before a Certificate of Occupancy is granted. Some jurisdictions may issue a conditional permit with a remediation schedule attached.`:`<strong>Possibly yes</strong> — the ${r.violation_count} remaining violation(s) are low-to-medium severity. Check with your authority having jurisdiction (AHJ) whether a conditional permit with a remediation schedule is acceptable.`; } },
+  { q:'Which discipline is most at risk?',
+    a: (r)=>{ const cats={}; (r.violations||[]).forEach(v=>cats[v.category]=(cats[v.category]||0)+1); const top=Object.entries(cats).sort((a,b)=>b[1]-a[1])[0]; return top?`<strong>${top[0]}</strong> has the highest violation count (${top[1]} issue${top[1]>1?'s':''}). Prioritise your ${top[0]} subcontractor review and schedule a site re-measurement for those parameters first.`:`All disciplines appear to be compliant.`; } },
+];
+
+function initChat(data){
+  const msgs=document.getElementById('chat-msgs');
+  const chips=document.getElementById('chat-chips');
+  msgs.innerHTML='';
+  // Opening message
+  addChatMsg('ai', `I've reviewed the <strong>${data.file}</strong> compliance report. Risk score: <strong>${data.risk_score}/100 (${data.risk_level})</strong> with ${data.violation_count} violation${data.violation_count!==1?'s':''} detected. What would you like to know?`);
+  // Render chips
+  chips.innerHTML=CHAT_QA.map((qa,i)=>`<button class="chip" onclick="chatChip(${i})">${qa.q}</button>`).join('');
+}
+
+function toggleChat(open){
+  const p=document.getElementById('chat-panel');
+  if(open) p.classList.add('open'); else p.classList.remove('open');
+}
+
+function addChatMsg(role, html){
+  const msgs=document.getElementById('chat-msgs');
+  const div=document.createElement('div');
+  div.className='fu';
+  if(role==='ai'){
+    div.innerHTML=`<div class="flex items-start gap-2"><div class="w-5 h-5 rounded-full flex-shrink-0 mt-0.5 flex items-center justify-center" style="background:linear-gradient(135deg,#6366f1,#8b5cf6);font-size:.45rem;font-weight:700;color:#fff">AI</div><div class="ai-bub flex-1 text-xs text-gray-200 leading-relaxed">${html}</div></div>`;
+  } else {
+    div.innerHTML=`<div class="flex justify-end"><div class="usr-bub text-xs text-gray-200 leading-relaxed max-w-xs">${html}</div></div>`;
+  }
+  msgs.appendChild(div);
+  msgs.scrollTop=msgs.scrollHeight;
+}
+
+function chatChip(i){
+  if(!curReport) return;
+  const qa=CHAT_QA[i];
+  addChatMsg('user', qa.q);
+  setTimeout(()=>{ addChatMsg('ai', qa.a(curReport)); }, 600);
+}
+
+function chatSend(){
+  const inp=document.getElementById('chat-inp');
+  const txt=inp.value.trim(); if(!txt) return;
+  inp.value='';
+  addChatMsg('user', txt);
+  // Find closest matching chip or give a generic context-aware reply
+  const lower=txt.toLowerCase();
+  let matched=null;
+  for(const qa of CHAT_QA){
+    if(qa.q.toLowerCase().split(' ').some(w=>w.length>4&&lower.includes(w))){ matched=qa; break; }
+  }
+  setTimeout(()=>{
+    if(matched && curReport) addChatMsg('ai', matched.a(curReport));
+    else if(curReport) addChatMsg('ai', `Based on the <strong>${curReport.file}</strong> report (risk score ${curReport.risk_score}/100), I can answer questions about violations, remediation timeline, cost impact, permit status, and discipline risk. Try one of the suggested questions below, or ask about a specific violation.`);
+    else addChatMsg('ai', 'Please open a report first, then I can answer specific questions about its violations and remediation.');
+  }, 700);
+}
+
+// ── Dashboard ──────────────────────────────────────────────────
+async function loadDash(){
+  try{
+    const{reports}=await(await fetch('/compliance/reports')).json();
+    const total=reports.length, tv=reports.reduce((a,r)=>a+(r.violation_count||0),0), avg=total?Math.round(reports.reduce((a,r)=>a+(r.risk_score||0),0)/total):0;
+    animN('st-t',total); animN('st-v',tv); animN('st-a',avg);
+    const sev={CRITICAL:0,HIGH:0,MEDIUM:0,LOW:0};
+    reports.forEach(r=>Object.keys(sev).forEach(k=>sev[k]+=(r.severity_counts||{})[k]||0));
+    const tot=Object.values(sev).reduce((a,b)=>a+b,0)||1;
+    const sc={CRITICAL:'bg-red-500',HIGH:'bg-orange-500',MEDIUM:'bg-yellow-500',LOW:'bg-green-500'};
+    document.getElementById('d-sev').innerHTML=Object.entries(sev).map(([s,n])=>`<div><div class="flex justify-between mb-1"><span style="font-size:.67rem" class="text-gray-400">${s}</span><span style="font-size:.67rem" class="text-white font-bold">${n}</span></div><div class="pbar"><div class="pbar-fill ${sc[s]}" id="sb-${s}" style="width:0%"></div></div></div>`).join('');
+    setTimeout(()=>Object.entries(sev).forEach(([s,n])=>{ const e=document.getElementById('sb-'+s); if(e)e.style.width=Math.round(n/tot*100)+'%'; }),100);
+    const dr=document.getElementById('d-rec');
+    if(!reports.length){ dr.innerHTML='<div class="px-5 py-8 text-center text-gray-600 text-sm">No reports yet — <button onclick="pg(\'check\')" class="text-indigo-400 underline">run your first check</button></div>'; return; }
+    const lc={CRITICAL:'text-red-400',HIGH:'text-orange-400',MEDIUM:'text-yellow-400',LOW:'text-green-400'};
+    dr.innerHTML=reports.slice(0,5).map(r=>{ const lk=rk(r.risk_level||'');
+      return `<div class="card px-5 py-3.5 flex items-center gap-4" onclick="openById('${r.report_id}')">
+        <div class="w-8 h-8 rounded-lg glass2 flex items-center justify-center flex-shrink-0 text-gray-500" style="font-size:.56rem;font-family:monospace">${(r.file||'').split('.').pop().toUpperCase()}</div>
+        <div class="flex-1 min-w-0"><p class="text-white text-xs font-semibold truncate">${r.file}</p><p class="text-gray-600 truncate mt-0.5" style="font-size:.62rem">${(r.summary||'').slice(0,80)}…</p></div>
+        <div class="text-right flex-shrink-0"><p class="text-xl font-bold ${lc[lk]||'text-gray-400'}">${r.risk_score??'—'}</p><p style="font-size:.58rem" class="${lc[lk]||'text-gray-500'} font-semibold">${r.risk_level||''}</p></div>
+        <div class="text-right flex-shrink-0 w-14"><p style="font-size:.67rem" class="text-red-400">${r.violation_count} fail</p><p style="font-size:.67rem" class="text-green-400">${r.compliant_count} pass</p></div>
+        <svg class="w-3.5 h-3.5 text-gray-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+      </div>`;}).join('');
+  }catch(e){}
+}
+
+// ── History ────────────────────────────────────────────────────
+async function loadHist(){
+  const el=document.getElementById('hgrid'); el.innerHTML='<div class="col-span-3 text-center py-10 text-gray-600 text-sm">Loading…</div>';
+  try{
+    const{reports}=await(await fetch('/compliance/reports')).json();
+    if(!reports.length){ el.innerHTML='<div class="col-span-3 text-center py-16 text-gray-600 text-sm">No reports yet.<br><button onclick="pg(\'check\')" class="mt-3 text-indigo-400 text-xs underline">Run first check</button></div>'; return; }
+    const lc={CRITICAL:'border-red-500/40',HIGH:'border-orange-500/40',MEDIUM:'border-yellow-500/40',LOW:'border-green-500/40'};
+    el.innerHTML=reports.map(r=>{ const lk=rk(r.risk_level||''),bc=lc[lk]||'border-white/10',tc='col-'+lk;
+      return `<div class="glass rounded-xl p-4 card border ${bc}" onclick="openById('${r.report_id}')">
+        <div class="flex items-start justify-between mb-2">
+          <div class="flex items-center gap-2.5"><div class="w-8 h-8 rounded-lg glass2 flex items-center justify-center text-gray-500 flex-shrink-0" style="font-size:.56rem;font-family:monospace">${(r.file||'').split('.').pop().toUpperCase()}</div>
+            <div><p class="text-white text-xs font-semibold">${r.file}</p><p style="font-size:.58rem" class="text-gray-600 mt-0.5">${(r.source||'file')==='manual'?'📝 Manual':'📄 File'}</p></div>
+          </div>
+          <div class="text-right"><p class="text-2xl font-bold ${tc}">${r.risk_score??'—'}</p><p style="font-size:.58rem" class="${tc} font-semibold">${r.risk_level||''}</p></div>
+        </div>
+        <p style="font-size:.65rem" class="text-gray-500 line-clamp-2 mb-3">${r.summary||''}</p>
+        <div class="flex gap-1.5 mb-2 flex-wrap">${Object.entries(r.severity_counts||{}).filter(([,n])=>n>0).map(([s,n])=>`<span class="badge-${s} text-xs px-1.5 py-0.5 rounded">${n} ${s}</span>`).join('')||'<span style="font-size:.65rem" class="text-green-400">✓ All compliant</span>'}</div>
+        <div class="flex items-center justify-between pt-2 border-t border-white/5">
+          <div class="flex gap-3"><span style="font-size:.65rem" class="text-red-400">${r.violation_count} violations</span><span style="font-size:.65rem" class="text-green-400">${r.compliant_count} compliant</span></div>
+          <span style="font-size:.65rem" class="text-indigo-400">Drill-down →</span>
+        </div>
+      </div>`;}).join('');
+    const b=document.getElementById('hbadge'); b.textContent=reports.length; b.classList.remove('hidden');
+  }catch(e){ el.innerHTML='<div class="col-span-3 text-red-400 text-xs text-center py-8">Failed to load</div>'; }
+}
+
+async function openById(id){
+  try{
+    const data=await(await fetch('/compliance/reports/'+id)).json();
+    curReport=data; prevPage='hist';
+    openFullReport(data);
+  }catch(e){ alert('Could not load report: '+e.message); }
+}
+
+// ── Projects ───────────────────────────────────────────────────
+async function loadProjects(){
+  const el=document.getElementById('pgrid');
+  if(!authToken){ el.innerHTML='<div class="col-span-3 text-center py-16 text-gray-600 text-sm">Sign in to manage projects.</div>'; return; }
+  el.innerHTML='<div class="col-span-3 text-center py-10 text-gray-600 text-sm">Loading…</div>';
+  try{
+    const{projects}=await(await fetch('/auth/projects',{headers:{'Authorization':'Bearer '+authToken}})).json();
+    if(!projects.length){
+      el.innerHTML=`<div class="col-span-3 text-center py-16 text-gray-600 text-sm">No projects yet.<br><button onclick="document.getElementById('proj-modal').classList.remove('hidden')" class="mt-3 text-indigo-400 text-xs underline">Create your first project</button></div>`;
+      return;
+    }
+    el.innerHTML=projects.map(p=>`<div class="glass rounded-xl p-5 card" onclick="openProject('${p.id}','${p.name.replace(/'/g,'\\&apos;')}')">
+      <div class="w-10 h-10 rounded-xl flex items-center justify-center mb-3" style="background:linear-gradient(135deg,rgba(99,102,241,.25),rgba(139,92,246,.25));border:1px solid rgba(99,102,241,.3)">
+        <svg class="w-5 h-5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M3 7a2 2 0 012-2h4l2 2h8a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V7z"/></svg>
+      </div>
+      <p class="text-white font-semibold text-sm mb-1">${p.name}</p>
+      <p style="font-size:.67rem" class="text-gray-500 mb-3 line-clamp-2">${p.description||'No description'}</p>
+      <p style="font-size:.6rem" class="text-gray-600">${p.created_at?.slice(0,10)||'—'}</p>
+    </div>`).join('');
+  }catch(e){ el.innerHTML=`<div class="col-span-3 text-red-400 text-xs text-center py-8">${e.message}</div>`; }
+}
+
+async function createProject(){
+  const name=document.getElementById('pm-name').value.trim(), desc=document.getElementById('pm-desc').value.trim();
+  const err=document.getElementById('pm-err');
+  if(!name){ err.textContent='Project name required'; err.classList.remove('hidden'); return; }
+  try{
+    await fetch('/auth/projects',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+authToken},body:JSON.stringify({name,description:desc})});
+    document.getElementById('proj-modal').classList.add('hidden');
+    document.getElementById('pm-name').value=''; document.getElementById('pm-desc').value='';
+    err.classList.add('hidden');
+    loadProjects();
+  }catch(e){ err.textContent=e.message; err.classList.remove('hidden'); }
+}
+
+async function openProject(id, name){
+  try{
+    const{report_ids}=await(await fetch('/auth/projects/'+id+'/reports',{headers:{'Authorization':'Bearer '+authToken}})).json();
+    alert(`Project: ${name}\n\nAttached reports (${report_ids.length}):\n${report_ids.slice(0,5).join('\n')||'None yet — open a report and click "Save to Project"'}`);
+  }catch(e){}
+}
+
+async function openAttachModal(){
+  if(!curReport){ alert('No report open.'); return; }
+  if(!authToken){ alert('Sign in to save reports to projects.'); return; }
+  const list=document.getElementById('attach-list');
+  list.innerHTML='<p class="text-gray-600 text-xs text-center py-2">Loading…</p>';
+  document.getElementById('attach-modal').classList.remove('hidden');
+  try{
+    const{projects}=await(await fetch('/auth/projects',{headers:{'Authorization':'Bearer '+authToken}})).json();
+    if(!projects.length){ list.innerHTML='<p class="text-gray-600 text-xs text-center py-3">No projects yet. Create one below.</p>'; return; }
+    list.innerHTML=projects.map(p=>`<button onclick="attachToProject('${p.id}')" class="w-full text-left glass2 rounded-lg px-3 py-2.5 hover:bg-white/8 transition-colors"><p class="text-white text-xs font-semibold">${p.name}</p><p style="font-size:.6rem" class="text-gray-500">${p.description||'—'}</p></button>`).join('');
+  }catch(e){ list.innerHTML=`<p class="text-red-400 text-xs">${e.message}</p>`; }
+}
+
+async function attachToProject(projectId){
+  if(!curReport) return;
+  const rid=curReport.report_id||curReport.file+'_attached';
+  await fetch('/auth/projects/'+projectId+'/reports/'+encodeURIComponent(rid),{method:'POST',headers:{'Authorization':'Bearer '+authToken}});
+  document.getElementById('attach-modal').classList.add('hidden');
+  alert('Report saved to project!');
+}
+
+// ── Rules ──────────────────────────────────────────────────────
+async function loadRules(){
+  if(allRules.length){ renderRules(allRules); return; }
+  allRules=(await(await fetch('/compliance/rules')).json()).rules;
+  renderRules(allRules);
+}
+function rf(cat){
+  ['all','HVAC','Electrical','Plumbing','Fire'].forEach(c=>document.getElementById('rf-'+c).className='text-xs px-3 py-1 rounded-full glass text-gray-400');
+  document.getElementById('rf-'+(cat==='Fire Protection'?'Fire':cat)).className='text-xs px-3 py-1 rounded-full bg-indigo-600/25 text-indigo-300 border border-indigo-500/30';
+  renderRules(cat==='all'?allRules:allRules.filter(r=>r.category===cat));
+}
+function renderRules(rules){
+  const cc={HVAC:'text-indigo-400',Electrical:'text-yellow-400',Plumbing:'text-blue-400','Fire Protection':'text-red-400'};
+  document.getElementById('rgrid').innerHTML=rules.map(r=>`<div class="glass rounded-xl p-4 hover:border-white/12 transition-colors"><div class="flex items-start justify-between gap-2 mb-2"><div><p style="font-size:.58rem" class="text-gray-600 font-mono mb-0.5">${r.id} · <span class="${cc[r.category]||'text-gray-400'}">${r.category}</span></p><p class="text-white text-sm font-semibold">${r.rule}</p></div><span class="badge-${r.severity} text-xs px-2 py-0.5 rounded flex-shrink-0">${r.severity}</span></div><p style="font-size:.67rem" class="text-gray-500 mb-2 font-mono">${r.parameter.replace(/_/g,' ')}</p><div class="flex items-center gap-3 flex-wrap"><span style="font-size:.6rem" class="bg-white/5 text-gray-500 px-2 py-0.5 rounded font-mono">${r.code_reference}</span>${r.min_value!=null?`<span style="font-size:.6rem" class="text-green-400">Min: ${r.min_value} ${r.unit}</span>`:''}${r.max_value!=null?`<span style="font-size:.6rem" class="text-orange-400">Max: ${r.max_value} ${r.unit}</span>`:''}</div></div>`).join('');
+}
+
+// ── Utils ──────────────────────────────────────────────────────
+function togM(){ const b=document.getElementById('mbody'),a=document.getElementById('marr'); b.classList.toggle('hidden'); a.style.transform=b.classList.contains('hidden')?'':'rotate(180deg)'; }
+function show(id){ document.getElementById(id)?.classList.remove('hidden'); }
+function hide(id){ document.getElementById(id)?.classList.add('hidden'); }
+function w(ms){ return new Promise(r=>setTimeout(r,ms)); }
+function ldt(t,s){ document.getElementById('ltit').textContent=t; document.getElementById('lsub').textContent=s; }
+function rk(l){ return l.includes('CRITICAL')?'CRITICAL':l.includes('HIGH')?'HIGH':l.includes('MEDIUM')?'MEDIUM':'LOW'; }
+function col(lk){ return {CRITICAL:'#ef4444',HIGH:'#f97316',MEDIUM:'#eab308',LOW:'#22c55e'}[lk]||'#6366f1'; }
+function dlR(){ if(!curReport)return; const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([JSON.stringify(curReport,null,2)],{type:'application/json'})); a.download='mep_report_'+Date.now()+'.json'; a.click(); }
+function animN(id,t){ const el=document.getElementById(id); if(!el)return; let n=0; const ti=setInterval(()=>{ n=Math.min(n+Math.max(1,Math.ceil(t/25)),t); el.textContent=n; if(n>=t)clearInterval(ti); },40); }
+async function updateBadge(){ try{ const{count}=await(await fetch('/compliance/reports')).json(); const b=document.getElementById('hbadge'); if(count>0){b.textContent=count;b.classList.remove('hidden');} }catch(e){} }
+
+// Init
+checkAuth();
+</script>
+</body>
+</html>

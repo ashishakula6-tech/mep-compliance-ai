@@ -1,0 +1,123 @@
+[
+  {
+    "id": "HVAC-001",
+    "category": "HVAC",
+    "rule": "Minimum duct clearance",
+    "parameter": "duct_clearance_mm",
+    "min_value": 300,
+    "max_value": null,
+    "unit": "mm",
+    "code_reference": "ASHRAE 90.1 §6.4.3",
+    "severity": "HIGH"
+  },
+  {
+    "id": "HVAC-002",
+    "category": "HVAC",
+    "rule": "Supply air temperature",
+    "parameter": "supply_air_temp_c",
+    "min_value": 13,
+    "max_value": 18,
+    "unit": "°C",
+    "code_reference": "ASHRAE 55-2020",
+    "severity": "MEDIUM"
+  },
+  {
+    "id": "HVAC-003",
+    "category": "HVAC",
+    "rule": "Minimum fresh air rate",
+    "parameter": "fresh_air_rate_percent",
+    "min_value": 15,
+    "max_value": null,
+    "unit": "%",
+    "code_reference": "ASHRAE 62.1 §6.2",
+    "severity": "HIGH"
+  },
+  {
+    "id": "ELEC-001",
+    "category": "Electrical",
+    "rule": "Electrical panel spacing from wall",
+    "parameter": "panel_spacing_mm",
+    "min_value": 1000,
+    "max_value": null,
+    "unit": "mm",
+    "code_reference": "NEC 110.26(A)",
+    "severity": "HIGH"
+  },
+  {
+    "id": "ELEC-002",
+    "category": "Electrical",
+    "rule": "Cable tray fill ratio",
+    "parameter": "cable_tray_fill_percent",
+    "min_value": null,
+    "max_value": 40,
+    "unit": "%",
+    "code_reference": "NEC 392.22",
+    "severity": "MEDIUM"
+  },
+  {
+    "id": "ELEC-003",
+    "category": "Electrical",
+    "rule": "Minimum conduit diameter for circuit",
+    "parameter": "conduit_diameter_mm",
+    "min_value": 20,
+    "max_value": null,
+    "unit": "mm",
+    "code_reference": "NEC 358.22",
+    "severity": "LOW"
+  },
+  {
+    "id": "PLMB-001",
+    "category": "Plumbing",
+    "rule": "Minimum pipe slope for drainage",
+    "parameter": "pipe_slope_mm_per_m",
+    "min_value": 20,
+    "max_value": null,
+    "unit": "mm/m",
+    "code_reference": "IPC §704.1",
+    "severity": "HIGH"
+  },
+  {
+    "id": "PLMB-002",
+    "category": "Plumbing",
+    "rule": "Hot water supply temperature",
+    "parameter": "hot_water_temp_c",
+    "min_value": 60,
+    "max_value": 80,
+    "unit": "°C",
+    "code_reference": "IPC §501.1",
+    "severity": "HIGH"
+  },
+  {
+    "id": "PLMB-003",
+    "category": "Plumbing",
+    "rule": "Minimum cold water pressure",
+    "parameter": "cold_water_pressure_kpa",
+    "min_value": 140,
+    "max_value": 550,
+    "unit": "kPa",
+    "code_reference": "IPC §604.3",
+    "severity": "MEDIUM"
+  },
+  {
+    "id": "FIRE-001",
+    "category": "Fire Protection",
+    "rule": "Sprinkler head spacing",
+    "parameter": "sprinkler_spacing_m",
+    "min_value": null,
+    "max_value": 4.6,
+    "unit": "m",
+    "code_reference": "NFPA 13 §8.6.2",
+    "severity": "CRITICAL"
+  },
+  {
+    "id": "FIRE-002",
+    "category": "Fire Protection",
+    "rule": "Fire suppression pipe pressure",
+    "parameter": "fire_pipe_pressure_kpa",
+    "min_value": 345,
+    "max_value": null,
+    "unit": "kPa",
+    "code_reference": "NFPA 13 §7.1.1",
+    "severity": "CRITICAL"
+  }
+]
